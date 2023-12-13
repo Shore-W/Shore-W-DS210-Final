@@ -1,5 +1,3 @@
-"# Shore-W-DS210-Final" 
-
 ## DS 210 Final Project: K-means Clustering for Cholera Analysis
 ### Project Overview
 ### Title: Designing and Performing a K-means Clustering Algorithm to Analyze John Snow’s Cholera 1855 Report
