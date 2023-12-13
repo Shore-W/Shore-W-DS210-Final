@@ -95,27 +95,6 @@ pub fn run_kmeans(
 }
 
 
-pub fn compute_mean_squared_error(
-    data_points: &[Vec<f64>],
-    assignments: &[usize],
-    centroids: &[Vec<f64>],
-) -> f64 {
-
-    // Check if the lengths match
-    if data_points.len() != assignments.len() {
-        panic!("Lengths of data points and assignments must be the same.");
-    }
-
-    let mut squared_error_sum = 0.0;
-
-    for (data_point, &cluster) in data_points.iter().zip(assignments.iter()) {
-        let centroid = &centroids[cluster];
-        squared_error_sum += euclidean_distance(data_point, centroid).powi(2);
-    }
-
-    squared_error_sum / data_points.len() as f64
-}
-
 pub fn calculate_silhouette_score(
     features: &[Vec<f64>],
     assignments: &[usize],

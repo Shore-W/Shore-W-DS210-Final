@@ -13,7 +13,7 @@ pub fn train_plotting(
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Create a bitmap backend to store our png file in the project folder
     let root = BitMapBackend::new(
-        r#"C:\Users\hyper\OneDrive\Desktop\College\DS 210\Final Project\final_code\TrainResults.png"#,
+        r#"TrainResults.png"#,
         //ADAPT THIS TO FIT YOUR MACHINE
         (1920, 1080), //the size of the image is 1920x1080 so that the image is readable
     )
@@ -86,7 +86,7 @@ pub fn test_plotting(
     best_iteration: usize ) -> Result<(), Box<dyn std::error::Error>> {
     // Create a bitmap backend
     let root = BitMapBackend::new(
-        r#"C:\Users\hyper\OneDrive\Desktop\College\DS 210\Final Project\final_code\TestResults.png"#,
+        r#"TestResults.png"#,
         //ADAPT THIS TO FIT YOUR MACHINE
         (1920, 1080),
     )

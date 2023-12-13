@@ -32,16 +32,14 @@ fn run() -> Result<(), Box<dyn Error>> {
     let mut best_iteration = 0;
     let mut best_silhouette_score = f64::NEG_INFINITY;
     let mut best_cluster_to_death = Vec::new();
-    let mut best_mse = 0.0;
     let mut best_data_by_cluster = vec![Vec::new(); num_clusters];
     let mut best_centroids: Vec<Vec<f64>> = vec![Vec::new()];
-
-    // Initialize variables
-    let mut mse_results = Vec::new();
 
     //=================================================================================================================
     // KMEANS ITERATIONS
 
+    println!("===============================================");
+    println!("TRAINING ITERATIONS:");
     for iteration in 0..num_iterations {
         // Splitting data and extracting main features
         let (train_set, test_set) = kmeans::split_data(graph_data.data.clone(), train_test_ratio);
@@ -91,15 +89,6 @@ fn run() -> Result<(), Box<dyn Error>> {
         test_deaths = test_set.iter().map(|record| record.data[1] as i64).sum();
         //this will collect all the deaths from the test data set for comparison later
 
-        //this computes the mean squared error for the iteration, and it's score is going to be quite low because of the scale of our data 
-        let mse = kmeans::compute_mean_squared_error(
-            &train_extracted_features,
-            &train_assignments,
-            &train_centroids,
-        );
-
-        mse_results.push(mse); //pushes results into mse_results that we will use later for calculcating the average
-
         println!("Clusters for Training Iteration {}:", iteration);
 
         //this for loop will iterate over the training set and count the number of nodes within each cluster, and print them out cluster by cluster
@@ -127,7 +116,6 @@ fn run() -> Result<(), Box<dyn Error>> {
             best_silhouette_score = silhouette_score;
             best_iteration = iteration;
             best_cluster_to_death = sorted_cluster_to_death.clone();
-            best_mse = mse;
             best_centroids = train_centroids.clone();
 
             best_data_by_cluster = train_extracted_features
@@ -143,13 +131,9 @@ fn run() -> Result<(), Box<dyn Error>> {
         }
 
         println!("Silhouette Score for Iteration {}: {:4}", iteration, silhouette_score);
-        println!("MSE this Iteration: {:4}", mse);
 
         println!();
     }
-
-    let average_mse: f64 = mse_results.iter().sum::<f64>() / num_iterations as f64;
-
     //=================================================================================================================
     //PRINTING THE TRAINING RESULTS
 
@@ -157,12 +141,10 @@ fn run() -> Result<(), Box<dyn Error>> {
     println!("TRAINING RESULTS:");
     println!();
     println!(
-        "BEST ITERATION: {}\n Silhouette Score of {:.4}\n MSE of {:.4} (scaled)",
-        best_iteration, best_silhouette_score, best_mse
-    );
+        "BEST ITERATION: {}\n Silhouette Score of {:.4}",
+        best_iteration, best_silhouette_score);
 
     println!("Average deaths associated with each cluster: {:?}", best_cluster_to_death);
-    println!("Average MSE: {}", average_mse);
 
     println!("Check Project Folder for TrainingResults.png of the best iteration");
 
@@ -174,7 +156,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     //TESTING THE ACCURACY OF TRAINING
 
     println!("===============================================");
-    println!("TEST RESULTS");
+    println!("TESTING ITERATIONS:");
 
     println!("Death Map used:");
     println!("{:?}", best_cluster_to_death); //this contains the average deaths in the clusters that we will then multiply our future cluster nodes by
@@ -204,6 +186,7 @@ fn run() -> Result<(), Box<dyn Error>> {
                 .zip(test_assignments.iter())
                 .filter(|(_, &assignment)| assignment == cluster_idx)
                 .count();
+            println!("Cluster: {}, Nodes: {}", cluster_idx, node_count);
 
             if let Some((_, avg_deaths)) = best_cluster_to_death.get(cluster_idx) {
                 let predicted_deaths = node_count as f64 * avg_deaths;
@@ -257,6 +240,8 @@ fn run() -> Result<(), Box<dyn Error>> {
         //the iteration with the best values get graphed!
     }
     //these print statements reveal the best iteration, what the average difference is between iterations, and what other factors like the silhouette score are
+    println!("===============================================");
+    println!("TESTING RESULTS:");
     println!("Average Difference between Actual and Predicted deaths:");
     println!("{} Deaths", (total_difference / num_iterations as i64).abs());
     println!();
